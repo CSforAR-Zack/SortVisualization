@@ -25,8 +25,8 @@ public class SelectionSortMenu : MonoBehaviour
         }
         catch(Exception)
         {
-            activeSort.speed = 1f;
-            activeSort.numberOfCubes = 5;
+            activeSort.speed = 0.1f;
+            activeSort.numberOfCubes = 30;
         }
         activeSort.StartSort();
     }
@@ -34,5 +34,13 @@ public class SelectionSortMenu : MonoBehaviour
     public void ResetSort()
     {
         Destroy(activeSort.gameObject);
+    }
+
+    void Update() 
+    {
+        if(Input.GetKey(KeyCode.Return))
+        {
+            StartSort();
+        }
     }
 }
