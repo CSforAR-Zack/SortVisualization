@@ -24,29 +24,29 @@ public class SelectionSort : MonoBehaviour
         {
             int best = i;
 
-            unsortedList[i].GetComponent<Renderer>().material = materials[2]; // Current Place
+            SetColor(unsortedList[i], 2); // Current Place Color
             yield return new WaitForSeconds(speed);
 
             for(int j = i + 1; j < unsortedList.Length; j++)
             {
-                unsortedList[j].GetComponent<Renderer>().material = materials[4]; // Looking At      
+                SetColor(unsortedList[j], 4); // Looking At Color    
                 yield return new WaitForSeconds(speed);
 
                 if(unsortedList[j].transform.localScale.y < unsortedList[best].transform.localScale.y)
                 {
                     if(best == i){
-                        unsortedList[i].GetComponent<Renderer>().material = materials[2]; // Current Place
+                        SetColor(unsortedList[i], 2); // Current Place Color
                     }
                     else
                     {
-                        unsortedList[best].GetComponent<Renderer>().material = materials[0]; // Unsorted
+                        SetColor(unsortedList[best], 0); // Unsorted Color
                     }
                     best = j;
-                    unsortedList[best].GetComponent<Renderer>().material = materials[3]; // Best
+                    SetColor(unsortedList[best], 3); // Best Color
                 }
                 else
                 {
-                    unsortedList[j].GetComponent<Renderer>().material = materials[0]; // Unsorted
+                    SetColor(unsortedList[j], 0); // Unsorted Color
                 }
             }
 
@@ -55,9 +55,15 @@ public class SelectionSort : MonoBehaviour
                 Swap(unsortedList, i, best);
                 yield return new WaitForSeconds(speed);
             }
-            unsortedList[best].GetComponent<Renderer>().material = materials[0]; // Unsorted
-            unsortedList[i].GetComponent<Renderer>().material = materials[1]; // Sorted
+            SetColor(unsortedList[best], 0); // Unsorted Color
+            SetColor(unsortedList[i], 1); // Sorted Color
+            unsortedList[i].GetComponentInChildren<ParticleSystem>().Play();
         }
+    }
+
+    void SetColor(GameObject cube, int materialIndex)
+    {
+        cube.GetComponent<Renderer>().material = materials[materialIndex];
     }
 
     void Swap(GameObject[] list, int i, int j)
@@ -66,13 +72,9 @@ public class SelectionSort : MonoBehaviour
         list[i] = list[j];
         list[j] = temp;
 
-        Vector3 tempPosition = list[i].transform.localPosition;
-
-        LeanTween.moveLocalX(list[i], list[j].transform.localPosition.x, speed);
-        LeanTween.moveLocalZ(list[i], -3f, speed/2).setLoopPingPong(1);
-        
-        LeanTween.moveLocalX(list[j], tempPosition.x, speed);
-        LeanTween.moveLocalZ(list[j], 3f, speed/2).setLoopPingPong(1);
+        GameObject cubeSwapper = new GameObject();
+        cubeSwapper.AddComponent<CubeSwapper>();
+        cubeSwapper.GetComponent<CubeSwapper>().Setup(list[j], list[i], speed);
     }
 
     void IntializeRandomCubes()
@@ -86,6 +88,7 @@ public class SelectionSort : MonoBehaviour
             Vector3 cubePosition = new Vector3(i, randomNumber / 2f, 0f);
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+            cube.GetComponentInChildren<ParticleSystem>().Stop();
             cube.transform.localScale = new Vector3(0.7f, randomNumber, 1f);
 
             Canvas canvas = Instantiate(canvasPrefab, new Vector3(i, -1f, -0.501f), Quaternion.identity);
